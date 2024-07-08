@@ -18,7 +18,7 @@ var appStorageAccountName = 'todoweb${resourceNameSuffix}'
 
 // Define the SKUs for each component based on the environment type.
 var environmentConfigurationMap = {
-  qa: {
+  dev: {
     appServicePlan: {
       sku: {
         name: 'F1'
