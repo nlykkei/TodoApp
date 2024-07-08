@@ -47,13 +47,38 @@ jobs:
         scope: resourcegroup
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
         template: ./infrastructure/main.bicep
-        parameters: environmentType=${{ env.ENVIRONMENT }}
+        parameters: >
+          environmentType=${{ env.ENVIRONMENT }}
         deploymentMode: Validate #  preflight validation
+
+  preview:
+    runs-on: ubuntu-latest
+    needs: [lint, validate]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - uses: azure/arm-deploy@v1
+      name: Run what-if
+      with:
+        deploymentName: ${{ github.run_number }}
+        scope: resourcegroup
+        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
+        template: infrastructure/main.bicep
+        parameters: >
+          environmentType=${{ env.ENVIRONMENT }}
+        additionalArguments: --what-if
+        failOnStdErr: false
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [lint, validate]
+    needs: [preview]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -70,5 +95,6 @@ jobs:
         scope: resourcegroup
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
         template: ./infrastructure/main.bicep
-        parameters: environmentType=${{ env.ENVIRONMENT }}
+        parameters: >
+          environmentType=${{ env.ENVIRONMENT }}
         failOnStdErr: false
