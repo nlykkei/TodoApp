@@ -12,6 +12,8 @@ permissions:
   id-token: write
   contents: read
 
+# https://learn.microsoft.com/en-us/training/modules/manage-end-end-deployment-scenarios-using-bicep-github-actions/3-configure-applications-virtual-machines
+
 jobs:
   build:
     name: Build

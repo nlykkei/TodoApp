@@ -112,7 +112,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ needs.deploy.outputs.appServiceAppName }}
-          package: website/publish.zip
+          package: publish.zip
     needs: [deploy]
 
   smoke-test:
