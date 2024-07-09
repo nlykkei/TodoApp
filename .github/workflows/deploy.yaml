@@ -58,7 +58,7 @@ jobs:
             environment=${{ inputs.environment }}
             reviewApiUrl=${{ inputs.reviewApiUrl }}
             reviewApiKey=${{ secrets.reviewApiKey }}
-            additionalArguments: --what-if
+          additionalArguments: --what-if
           failOnStdErr: false
         if: inputs.environment == 'production'
 

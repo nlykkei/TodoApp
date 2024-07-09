@@ -1,6 +1,9 @@
 
 name: Deploy Todo App (E2E)
-concurrency: todo-app-deploy
+
+concurrency:
+  group: todo-all-deploy
+  cancel-in-progress: true
 
 on:
   push:
