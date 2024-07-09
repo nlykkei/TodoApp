@@ -28,11 +28,11 @@ jobs:
       environment: test
       resourceGroupName: TodoAppTest
       reviewApiUrl: https://sandbox.contoso.com/reviews
-      secrets:
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        reviewApiKey: ${{ secrets.REVIEW_API_KEY_TEST }}
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      reviewApiKey: ${{ secrets.REVIEW_API_KEY_TEST }}
     needs: [build, lint]
 
   deploy-production:
@@ -42,9 +42,9 @@ jobs:
       environment: production
       resourceGroupName: TodoAppProd
       reviewApiUrl: https://api.contoso.com/reviews
-      secrets:
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        reviewApiKey: ${{ secrets.REVIEW_API_KEY_PRODUCTION }}
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      reviewApiKey: ${{ secrets.REVIEW_API_KEY_PRODUCTION }}
     needs: [deploy-test]
