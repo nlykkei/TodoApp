@@ -55,7 +55,7 @@ jobs:
           resourceGroupName: ${{ inputs.resourceGroupName }}
           template: ./infra/main.bicep
           parameters: >
-            environmentType=${{ inputs.environment }}
+            environment=${{ inputs.environment }}
             reviewApiUrl=${{ inputs.reviewApiUrl }}
             reviewApiKey=${{ secrets.reviewApiKey }}
             additionalArguments: --what-if
