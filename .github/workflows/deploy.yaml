@@ -123,7 +123,7 @@ jobs:
       - name: Smoke tests
         run: |
           $container = New-PesterContainer `
-            -Path 'deploy/Website.Tests.ps1' `
+            -Path 'infra/Website.Tests.ps1' `
             -Data @{ HostName = '${{needs.deploy.outputs.appServiceAppHostName}}' }
           Invoke-Pester `
             -Container $container `

@@ -5,7 +5,6 @@ param(
 )
 
 Describe 'TodoApp' {
-
   It 'Serves pages over HTTPS' {
     $request = [System.Net.WebRequest]::Create("https://$HostName/")
     $request.AllowAutoRedirect = $false
@@ -19,5 +18,4 @@ Describe 'TodoApp' {
     $request.GetResponse().StatusCode |
     Should -BeGreaterOrEqual 300 -Because "HTTP is not secure"
   }
-
 }
