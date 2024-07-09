@@ -77,10 +77,3 @@ resource appStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   kind: 'StorageV2'
   sku: environmentConfigurationMap[environmentType].appStorageAccount.sku
 }
-
-resource testStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: 'dinilyivteststorageacc'
-  location: location
-  kind: 'StorageV2'
-  sku: { name: 'Standard_LRS' }
-}
