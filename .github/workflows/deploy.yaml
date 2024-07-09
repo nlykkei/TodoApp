@@ -85,7 +85,7 @@ jobs:
           deploymentName: ${{ github.run_number }}
           scope: resourcegroup
           resourceGroupName: ${{ inputs.resourceGroupName }}
-          template: ./deploy/main.bicep
+          template: ./infra/main.bicep
           parameters: >
             environmentType=${{ inputs.environment }}
             reviewApiUrl=${{ inputs.reviewApiUrl }}
