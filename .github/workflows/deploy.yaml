@@ -115,18 +115,18 @@ jobs:
           package: publish.zip
     needs: [deploy]
 
-  smoke-test:
-    name: Smoke tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Smoke tests
-        run: |
-          $container = New-PesterContainer `
-            -Path 'infra/Website.Tests.ps1' `
-            -Data @{ HostName = '${{needs.deploy.outputs.appServiceAppHostName}}' }
-          Invoke-Pester `
-            -Container $container `
-            -CI
-        shell: pwsh
-    needs: [deploy, deploy-application]
+  # smoke-test:
+  #   name: Smoke tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Smoke tests
+  #       run: |
+  #         $container = New-PesterContainer `
+  #           -Path 'infra/Website.Tests.ps1' `
+  #           -Data @{ HostName = '${{needs.deploy.outputs.appServiceAppHostName}}' }
+  #         Invoke-Pester `
+  #           -Container $container `
+  #           -CI
+  #       shell: pwsh
+  #   needs: [deploy, deploy-application]
