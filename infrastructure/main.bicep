@@ -71,9 +71,16 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
   }
 }
 
-// resource appStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-//   name: appStorageAccountName
-//   location: location
-//   kind: 'StorageV2'
-//   sku: environmentConfigurationMap[environmentType].appStorageAccount.sku
-// }
+resource appStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: appStorageAccountName
+  location: location
+  kind: 'StorageV2'
+  sku: environmentConfigurationMap[environmentType].appStorageAccount.sku
+}
+
+resource testStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: 'dinilyivteststorageacc'
+  location: location
+  kind: 'StorageV2'
+  sku: { name: 'Standard_LRS' }
+}
