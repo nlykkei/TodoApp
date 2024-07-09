@@ -1,0 +1,50 @@
+
+name: Deploy Todo App (E2E)
+concurrency: todo-app-deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yaml
+
+  deploy-test:
+    name: Deploy [test]
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: test
+      resourceGroupName: TodoAppTest
+      reviewApiUrl: https://sandbox.contoso.com/reviews
+      secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        reviewApiKey: ${{ secrets.REVIEW_API_KEY_TEST }}
+    needs: [build, lint]
+
+  deploy-production:
+    name: Deploy [production]
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: production
+      resourceGroupName: TodoAppProd
+      reviewApiUrl: https://api.contoso.com/reviews
+      secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        reviewApiKey: ${{ secrets.REVIEW_API_KEY_PRODUCTION }}
+    needs: [deploy-test]

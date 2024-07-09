@@ -1,100 +1,132 @@
-name: Deploy Todo App
-concurrency: deploy-todo-app
+name: Deploy
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  id-token: write
-  contents: read
-
-env:
-    AZURE_RESOURCE_GROUP_NAME: TodoApp
-    ENVIRONMENT: dev
-
-# https://learn.microsoft.com/en-us/training/modules/test-bicep-code-using-github-actions/3-lint-validate-bicep-code?pivots=powershell
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      resourceGroupName:
+        required: true
+        type: string
+      reviewApiUrl:
+        required: true
+        type: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+      reviewApiKey:
+        required: true
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Lint
-      run: |
-        az bicep build --file infrastructure/main.bicep    
-
   validate:
     name: Validate
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    - name: Preflight validation
-      uses: azure/arm-deploy@v2
-      with:
-        deploymentName: ${{ github.run_number }}
-        scope: resourcegroup
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
-        template: ./infrastructure/main.bicep
-        parameters: >
-          environmentType=${{ env.ENVIRONMENT }}
-        deploymentMode: Validate #  preflight validation
-
-  preview:
-    runs-on: ubuntu-latest
-    needs: [lint, validate]
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    - uses: azure/arm-deploy@v2
-      name: Run what-if
-      with:
-        deploymentName: ${{ github.run_number }}
-        scope: resourcegroup
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
-        template: infrastructure/main.bicep
-        parameters: >
-          environmentType=${{ env.ENVIRONMENT }}
-        additionalArguments: --what-if
-        failOnStdErr: false
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Preflight validation
+        uses: azure/arm-deploy@v2
+        with:
+          deploymentName: ${{ github.run_number }}
+          scope: resourcegroup
+          resourceGroupName: ${{ inputs.resourceGroupName }}
+          template: ./infra/main.bicep
+          parameters: >
+            environment=${{ inputs.environment }}
+            reviewApiUrl=${{ inputs.reviewApiUrl }}
+            reviewApiKey=${{ secrets.reviewApiKey }}
+          deploymentMode: Validate
+        if: inputs.environment != 'production'
+      - name: Run what-if
+        uses: azure/arm-deploy@v2
+        with:
+          scope: resourcegroup
+          resourceGroupName: ${{ inputs.resourceGroupName }}
+          template: ./infra/main.bicep
+          parameters: >
+            environmentType=${{ inputs.environment }}
+            reviewApiUrl=${{ inputs.reviewApiUrl }}
+            reviewApiKey=${{ secrets.reviewApiKey }}
+            additionalArguments: --what-if
+          failOnStdErr: false
+        if: inputs.environment == 'production'
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [preview]
+    environment: ${{ inputs.environment }}
+    outputs:
+      appServiceAppName: ${{ steps.deploy.outputs.appServiceAppName }}
+      appServiceAppHostName: ${{ steps.deploy.outputs.appServiceAppHostName }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    - name: Deploy
-      uses: azure/arm-deploy@v2
-      with:
-        deploymentName: ${{ github.run_number }}
-        scope: resourcegroup
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP_NAME }}
-        template: ./infrastructure/main.bicep
-        parameters: >
-          environmentType=${{ env.ENVIRONMENT }}
-        failOnStdErr: false
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy
+        uses: azure/arm-deploy@v2
+        id: deploy
+        with:
+          deploymentName: ${{ github.run_number }}
+          scope: resourcegroup
+          resourceGroupName: ${{ inputs.resourceGroupName }}
+          template: ./deploy/main.bicep
+          parameters: >
+            environmentType=${{ inputs.environment }}
+            reviewApiUrl=${{ inputs.reviewApiUrl }}
+            reviewApiKey=${{ secrets.reviewApiKey }}
+          failOnStdErr: false
+    needs: [validate]
+
+  deploy-application:
+    name: Deploy application
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy application
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ needs.deploy.outputs.appServiceAppName }}
+          package: website/publish.zip
+    needs: [deploy]
+
+  smoke-test:
+    name: Smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke tests
+        run: |
+          $container = New-PesterContainer `
+            -Path 'deploy/Website.Tests.ps1' `
+            -Data @{ HostName = '${{needs.deploy.outputs.appServiceAppHostName}}' }
+          Invoke-Pester `
+            -Container $container `
+            -CI
+        shell: pwsh
+    needs: [deploy, deploy-application]

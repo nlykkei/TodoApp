@@ -1,0 +1,29 @@
+name: Build Application
+
+on:
+  workflow_call:
+
+jobs:
+  build-application:
+    name: Build application
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0
+    - name: Build application
+      run: |
+        dotnet publish --configuration Release
+      working-directory: ./src/TodoApp/
+    - name: Zip application
+      run: |
+        zip -r publish.zip .
+      working-directory: ./src/TodoApp/bin/Release/net8.0/publish
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: application
+        path: ./src/TodoApp/bin/Release/net8.0/publish/publish.zip
