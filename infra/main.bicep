@@ -19,7 +19,7 @@ param reviewApiUrl string
 @description('The API key to use when accessing the product review API.')
 param reviewApiKey string
 
-// Define the names for resources.
+// Define the names for resources
 var appServiceAppName = 'todo-website-${resourceNameSuffix}'
 var appServicePlanName = 'todo-website'
 var logAnalyticsWorkspaceName = 'workspace-${resourceNameSuffix}'
@@ -67,6 +67,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
 resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
   name: appServiceAppName
   location: location
+  identity: { type: 'SystemAssigned' }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
@@ -91,6 +92,41 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
         }
       ]
     }
+  }
+}
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults?pivots=deployment-language-bicep
+resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+  name: '${appServiceApp.name}-key-vault'
+  location: location
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: subscription().tenantId
+    enableRbacAuthorization: true
+    // accessPolicies: [
+    //   {
+    //     tenantId: subscription().tenantId
+    //     objectId: appServiceApp.identity.principalId
+    //     permissions: {
+    //       keys: ['get']
+    //       secrets: ['get']
+    //     }
+    //   }
+    // ]
+  }
+}
+
+// https://learn.microsoft.com/en-us/azure/templates/microsoft.authorization/roleassignments?pivots=deployment-language-bicep
+resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: '${appServiceApp.name}-key-vault-role-assignment'
+  scope: keyVault
+  properties: {
+    principalId: appServiceApp.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    //'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Authorization/roleDefinitions/4633458b-17de-408a-b874-0445c86b69e6'
   }
 }
 
