@@ -59,6 +59,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: appServicePlanName
   location: location
   sku: environmentConfigurationMap[environment].appServicePlan.sku
+  properties: {
+    reserved: true
+  }
 }
 
 resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
@@ -68,6 +71,7 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
+      netFrameworkVersion: 'v8.0'
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
