@@ -20,11 +20,11 @@ param reviewApiUrl string
 param reviewApiKey string
 
 // Define the names for resources
-var appServiceAppName = 'todo-website-${resourceNameSuffix}'
-var appServicePlanName = 'todo-website'
-var logAnalyticsWorkspaceName = 'workspace-${resourceNameSuffix}'
-var applicationInsightsName = 'todo-website'
-var storageAccountName = 'todostorage${resourceNameSuffix}'
+var appServiceAppName = 'todo-app-${resourceNameSuffix}'
+var appServicePlanName = 'todo-app-${resourceNameSuffix}'
+var logAnalyticsWorkspaceName = 'todo-app-${resourceNameSuffix}'
+var applicationInsightsName = 'todo-app-${resourceNameSuffix}'
+var storageAccountName = 'todoapp${resourceNameSuffix}'
 
 // Define the SKUs for each component based on the environment type.
 var environmentConfigurationMap = {
@@ -97,7 +97,7 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.keyvault/vaults?pivots=deployment-language-bicep
 resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
-  name: '${appServiceApp.name}-key-vault'
+  name: appServiceAppName
   location: location
   properties: {
     sku: {
@@ -121,7 +121,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.authorization/roleassignments?pivots=deployment-language-bicep
 resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: '${appServiceApp.name}-key-vault-role-assignment'
+  name: 'todo-app-key-vault-${resourceNameSuffix}'
   scope: keyVault
   properties: {
     principalId: appServiceApp.identity.principalId
