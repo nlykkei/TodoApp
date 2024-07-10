@@ -31,13 +31,13 @@ var environmentConfigurationMap = {
   production: {
     appServicePlan: {
       sku: {
-        name: 'S1'
-        capacity: 1
+        name: 'F1' // name: 'S1'
+        // capacity: 1
       }
     }
     storageAccount: {
       sku: {
-        name: 'Standard_LRS'
+        name: 'Standard_GRS' // name: 'Standard_LRS'
       }
     }
   }
