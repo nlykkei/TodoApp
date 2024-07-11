@@ -121,12 +121,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
 
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.authorization/roleassignments?pivots=deployment-language-bicep
 resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: 'todo-app-key-vault-${resourceNameSuffix}'
+  name: guid(
+    resourceGroup().id,
+    resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+  )
   scope: keyVault
   properties: {
     principalId: appServiceApp.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-    //'/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Authorization/roleDefinitions/4633458b-17de-408a-b874-0445c86b69e6'
   }
 }
 
