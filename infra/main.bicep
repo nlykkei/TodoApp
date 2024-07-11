@@ -12,12 +12,9 @@ param environment string
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
-@description('The URL to the product review API.')
-param reviewApiUrl string
-
-@secure()
-@description('The API key to use when accessing the product review API.')
-param reviewApiKey string
+// @secure()
+// @description('The API key to use when accessing the product review API.')
+// param reviewApiKey string
 
 // Define the names for resources
 var appServiceAppName = 'todo-app-${resourceNameSuffix}'
@@ -59,9 +56,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: appServicePlanName
   location: location
   sku: environmentConfigurationMap[environment].appServicePlan.sku
-  properties: {
-    reserved: true
-  }
+  // properties: {
+  //   reserved: true
+  // }
 }
 
 resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
@@ -72,8 +69,8 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'DOTNETCORE:8.0'
-      // netFrameworkVersion: 'v8.0'
+      // linuxFxVersion: 'DOTNETCORE:8.0'
+      netFrameworkVersion: 'v8.0'
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -82,14 +79,6 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
-        }
-        {
-          name: 'ReviewApiUrl'
-          value: reviewApiUrl
-        }
-        {
-          name: 'ReviewApiKey'
-          value: reviewApiKey
         }
       ]
     }

@@ -44,8 +44,6 @@ jobs:
           template: ./infra/main.bicep
           parameters: >
             environment=${{ inputs.environment }}
-            reviewApiUrl=${{ inputs.reviewApiUrl }}
-            reviewApiKey=${{ secrets.reviewApiKey }}
           deploymentMode: Validate
         if: inputs.environment != 'production'
       - name: Run what-if
@@ -56,9 +54,8 @@ jobs:
           template: ./infra/main.bicep
           parameters: >
             environment=${{ inputs.environment }}
-            reviewApiUrl=${{ inputs.reviewApiUrl }}
-            reviewApiKey=${{ secrets.reviewApiKey }}
           additionalArguments: --what-if
+          deploymentMode: Complete
           failOnStdErr: false
         if: inputs.environment == 'production'
 
@@ -88,8 +85,7 @@ jobs:
           template: ./infra/main.bicep
           parameters: >
             environment=${{ inputs.environment }}
-            reviewApiUrl=${{ inputs.reviewApiUrl }}
-            reviewApiKey=${{ secrets.reviewApiKey }}
+          deploymentMode: Complete
           failOnStdErr: false
     needs: [validate]
 
