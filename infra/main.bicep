@@ -70,7 +70,7 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'DOTNETCORE:8.0'
+      linuxFxVersion: 'DOTNETCORE|8.0'
       // netFrameworkVersion: 'v8.0'
       appSettings: [
         {
