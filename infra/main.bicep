@@ -95,7 +95,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
       family: 'A'
       name: 'standard'
     }
-    tenantId: subscription().tenantId
+    tenantId: tenant().tenantId
     enableRbacAuthorization: true
     // accessPolicies: [
     //   {
@@ -110,16 +110,19 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   }
 }
 
+var keyVaultSecretsUserRoleId = subscriptionResourceId(
+  // resourceId(...)
+  'Microsoft.Authorization/roleDefinitions',
+  '4633458b-17de-408a-b874-0445c86b69e6'
+)
+
 // https://learn.microsoft.com/en-us/azure/templates/microsoft.authorization/roleassignments?pivots=deployment-language-bicep
-resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(
-    resourceGroup().id,
-    resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-  )
+resource keyVaultSecretsUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, keyVaultSecretsUserRoleId)
   scope: keyVault
   properties: {
     principalId: appServiceApp.identity.principalId
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    roleDefinitionId: keyVaultSecretsUserRoleId
   }
 }
 
