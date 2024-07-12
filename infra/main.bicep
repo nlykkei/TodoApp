@@ -83,7 +83,7 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'AzureAd__ClientSecret'
-          value: '@Microsoft.KeyVault(SecretUri=https://todo-app-rbqkyp2g5zxmq.vault.azure.net/secrets/ClientSecret/)'
+          value: '@Microsoft.KeyVault(SecretUri=https://todo-app-rbqkyp2g5zxmq${az.environment().suffixes.keyvaultDns}/secrets/ClientSecret/)'
         }
       ]
     }
