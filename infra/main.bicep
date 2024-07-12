@@ -110,8 +110,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
   }
 }
 
-var keyVaultSecretsUserRoleId = subscriptionResourceId(
-  // resourceId(...)
+var keyVaultSecretsUserRoleId = resourceId(
   'Microsoft.Authorization/roleDefinitions',
   '4633458b-17de-408a-b874-0445c86b69e6'
 )
@@ -152,11 +151,3 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
 output appServiceAppName string = appServiceApp.name
 output appServiceAppHostName string = appServiceApp.properties.defaultHostName
-output roleDefinitionIdSubscription string = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '4633458b-17de-408a-b874-0445c86b69e6'
-)
-output roleDefinitionIdResourceGroup string = resourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '4633458b-17de-408a-b874-0445c86b69e6'
-)
