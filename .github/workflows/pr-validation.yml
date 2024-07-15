@@ -1,0 +1,76 @@
+name: Todo App PR Validation
+
+concurrency: 
+  group: ${{ github.event.number }}
+  cancel-in-progress: false
+
+on: 
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  resourceGroupName: pr_${{ github.event.number }}
+  resourceGroupLocation: westeurope
+
+# https://learn.microsoft.com/en-us/training/modules/automate-azure-infrastructure-change-reviews-using-bicep-github/6-exercise-create-ephemeral-environments-pull-requests
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yml
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: test
+    outputs:
+      appServiceAppName: ${{ steps.deploy.outputs.appServiceAppName }}
+      appServiceAppHostName: ${{ steps.deploy.outputs.appServiceAppHostName }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/cli@v2
+        name: Create resource group
+        with:
+          inlineScript: |
+            az group create \
+              --name ${{ env.resourceGroupName }} \
+              --location ${{ env.resourceGroupLocation }}
+      - uses: azure/arm-deploy@v2
+        id: deploy
+        name: Deploy
+        with:
+          deploymentName: ${{ github.run_number }}
+          scope: resourceGroup
+          resourceGroupName: ${{ env.resourceGroupName }}
+          template: ./deploy/main.bicep
+          parameters: >
+            environment=test
+          deploymentMode: Complete
+          failOnStdErr: false
+      - name: Website URL
+        run: 'echo "Website URL 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> $GITHUB_STEP_SUMMARY'
+
+
+  deploy-application:
+    name: Deploy application
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment: test
+      appServiceAppName: ${{ needs.deploy.outputs.appServiceAppName }}
+    needs: [deploy]

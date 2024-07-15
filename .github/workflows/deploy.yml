@@ -9,18 +9,12 @@ on:
       resourceGroupName:
         required: true
         type: string
-    secrets:
-      AZURE_CLIENT_ID:
-        required: true
-      AZURE_TENANT_ID:
-        required: true
-      AZURE_SUBSCRIPTION_ID:
-        required: true
 
 jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,28 +76,16 @@ jobs:
             environment=${{ inputs.environment }}
           deploymentMode: Complete
           failOnStdErr: false
+      - name: Website URL
+        run: 'echo "Website URL 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> $GITHUB_STEP_SUMMARY'
     needs: [validate]
 
   deploy-application:
     name: Deploy application
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: application
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy application
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ needs.deploy.outputs.appServiceAppName }}
-          package: publish.zip
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment: ${{ inputs.environment }}
+      appServiceAppName: ${{ needs.deploy.outputs.appServiceAppName }}
     needs: [deploy]
 
   # smoke-test:

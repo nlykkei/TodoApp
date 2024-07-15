@@ -20,15 +20,15 @@ permissions:
 jobs:
   build:
     name: Build
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build.yml
 
   lint:
     name: Lint
-    uses: ./.github/workflows/lint.yaml
+    uses: ./.github/workflows/lint.yml
 
   deploy-test:
     name: Deploy [test]
-    uses: ./.github/workflows/deploy.yaml
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: test
       resourceGroupName: TodoAppTest
@@ -40,7 +40,7 @@ jobs:
 
   deploy-production:
     name: Deploy [production]
-    uses: ./.github/workflows/deploy.yaml
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: production
       resourceGroupName: TodoAppProd
