@@ -18,7 +18,7 @@ on:
         required: true
 
 jobs:
-  deploy-application:
+  deploy-app:
     name: Deploy application
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -27,7 +27,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: application
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}

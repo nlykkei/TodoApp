@@ -1,10 +1,10 @@
-name: Build Application
+name: Build
 
 on:
   workflow_call:
 
 jobs:
-  build-application:
+  build-app:
     name: Build application
     runs-on: ubuntu-latest
     steps:

@@ -20,16 +20,16 @@ env:
 # https://learn.microsoft.com/en-us/training/modules/automate-azure-infrastructure-change-reviews-using-bicep-github/6-exercise-create-ephemeral-environments-pull-requests
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
-
-  lint:
-    name: Lint
+  lint-infra:
+    name: Lint infrastructure
     uses: ./.github/workflows/lint.yml
 
-  deploy:
-    name: Deploy
+  build-app:
+    name: Build application
+    uses: ./.github/workflows/build.yml
+
+  deploy-infra:
+    name: Deploy infrastructure
     runs-on: ubuntu-latest
     environment: test
     outputs:
@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -53,27 +53,28 @@ jobs:
               --location ${{ env.resourceGroupLocation }}
       - uses: azure/arm-deploy@v2
         id: deploy
-        name: Deploy
+        name: Deploy infrastructure
         with:
           deploymentName: ${{ github.run_number }}
-          scope: resourceGroup
+          scope: resourcegroup
           resourceGroupName: ${{ env.resourceGroupName }}
-          template: ./deploy/main.bicep
+          template: ./infra/main.bicep
           parameters: >
             environment=test
           deploymentMode: Complete
           failOnStdErr: false
       - name: Website URL
-        run: 'echo "Website URL 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
+        run: 'echo "Website URL (test) 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
+    needs: [lint-infra, build-app]
 
-  deploy-application:
+  deploy-app:
     name: Deploy application
     uses: ./.github/workflows/deploy-app.yml
     with:
       environment: test
-      appServiceAppName: ${{ needs.deploy.outputs.appServiceAppName }}
+      appServiceAppName: ${{ needs.deploy-infra.outputs.appServiceAppName }}
     secrets:
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    needs: [deploy]
+    needs: [deploy-infra]
