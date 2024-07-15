@@ -1,11 +1,11 @@
-name: Lint
+name: Lint infrastructure
 
 on:
   workflow_call:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint infrastructure
     runs-on: ubuntu-latest
     steps:
     - name: Checkout

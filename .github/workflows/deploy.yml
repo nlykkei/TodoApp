@@ -18,20 +18,20 @@ on:
         required: true
 
 jobs:
-  validate:
-    name: Validate
+  validate-infra:
+    name: Validate infrastructure
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Preflight validation
+      - name: Run preflight validation
         uses: azure/arm-deploy@v2
         with:
           deploymentName: ${{ github.run_number }}
@@ -55,8 +55,8 @@ jobs:
           failOnStdErr: false
         if: inputs.environment == 'production'
 
-  deploy:
-    name: Deploy
+  deploy-infra:
+    name: Deploy infrastructure
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
@@ -65,13 +65,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy
+      - name: Deploy infrastructure
         uses: azure/arm-deploy@v2
         id: deploy
         with:
@@ -85,22 +85,22 @@ jobs:
           failOnStdErr: false
       - name: Website URL
         run: 'echo "Website URL (${{ inputs.environment }}) 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
-    needs: [validate]
+    needs: [validate-infra]
 
-  deploy-application:
+  deploy-app:
     name: Deploy application
     uses: ./.github/workflows/deploy-app.yml
     with:
       environment: ${{ inputs.environment }}
-      appServiceAppName: ${{ needs.deploy.outputs.appServiceAppName }}
+      appServiceAppName: ${{ needs.deploy-infra.outputs.appServiceAppName }}
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    needs: [deploy]
+    needs: [deploy-infra]
 
   # smoke-test:
-  #   name: Smoke tests
+  #   name: Run smoke tests
   #   runs-on: ubuntu-latest
   #   steps:
   #     - uses: actions/checkout@v4
@@ -113,4 +113,4 @@ jobs:
   #           -Container $container `
   #           -CI
   #       shell: pwsh
-  #   needs: [deploy, deploy-application]
+  #   needs: [deploy-infra, deploy-app]
