@@ -84,7 +84,7 @@ jobs:
           deploymentMode: Complete
           failOnStdErr: false
       - name: Website URL
-        run: 'echo "Website URL 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
+        run: 'echo "Website URL (${{ inputs.environment }}) 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
     needs: [validate]
 
   deploy-application:
