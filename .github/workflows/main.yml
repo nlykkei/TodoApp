@@ -32,6 +32,10 @@ jobs:
     with:
       environment: test
       resourceGroupName: TodoAppTest
+    secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     needs: [build, lint]
 
   deploy-production:
@@ -40,4 +44,8 @@ jobs:
     with:
       environment: production
       resourceGroupName: TodoAppProd
+    secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     needs: [deploy-test]
