@@ -28,13 +28,10 @@ jobs:
     name: Build application
     uses: ./.github/workflows/build.yml
 
-  deploy-infra:
-    name: Deploy infrastructure
+  create-rg:
+    name: Create resource group
     runs-on: ubuntu-latest
     environment: test
-    outputs:
-      appServiceAppName: ${{ steps.deploy.outputs.appServiceAppName }}
-      appServiceAppHostName: ${{ steps.deploy.outputs.appServiceAppHostName }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,30 +48,16 @@ jobs:
             az group create \
               --name ${{ env.resourceGroupName }} \
               --location ${{ env.resourceGroupLocation }}
-      - uses: azure/arm-deploy@v2
-        id: deploy
-        name: Deploy infrastructure
-        with:
-          deploymentName: ${{ github.run_number }}
-          scope: resourcegroup
-          resourceGroupName: ${{ env.resourceGroupName }}
-          template: ./infra/main.bicep
-          parameters: >
-            environment=test
-          deploymentMode: Complete
-          failOnStdErr: false
-      - name: Website URL
-        run: 'echo "Website URL (test) 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
     needs: [lint-infra, build-app]
 
-  deploy-app:
-    name: Deploy application
-    uses: ./.github/workflows/deploy-app.yml
+  deploy-infra:
+    name: Deploy infrastructure
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: test
-      appServiceAppName: ${{ needs.deploy-infra.outputs.appServiceAppName }}
+      resourceGroupName: pr_${{ github.event.number }}
     secrets:
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    needs: [deploy-infra]
+    needs: [create-rg]
