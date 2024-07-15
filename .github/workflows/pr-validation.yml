@@ -20,13 +20,13 @@ env:
 # https://learn.microsoft.com/en-us/training/modules/automate-azure-infrastructure-change-reviews-using-bicep-github/6-exercise-create-ephemeral-environments-pull-requests
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
-
   lint:
     name: Lint
     uses: ./.github/workflows/lint.yml
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
 
   deploy:
     name: Deploy
@@ -65,6 +65,7 @@ jobs:
           failOnStdErr: false
       - name: Website URL
         run: 'echo "Website URL (test) 🚀: https://${{ steps.deploy.outputs.appServiceAppHostName }}" >> "${GITHUB_STEP_SUMMARY}"'
+    needs: [lint, build]
 
   deploy-application:
     name: Deploy application
