@@ -58,7 +58,7 @@ jobs:
           deploymentName: ${{ github.run_number }}
           scope: resourcegroup
           resourceGroupName: ${{ env.resourceGroupName }}
-          template: ./deploy/main.bicep
+          template: ./infra/main.bicep
           parameters: >
             environment=test
           deploymentMode: Complete
