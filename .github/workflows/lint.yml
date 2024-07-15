@@ -1,4 +1,4 @@
-name: Lint infrastructure
+name: Lint
 
 on:
   workflow_call:
