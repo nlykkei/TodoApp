@@ -21,6 +21,7 @@ jobs:
   delete-infra:
     name: Delete infrastructure
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Login to Azure
         uses: azure/login@v2
