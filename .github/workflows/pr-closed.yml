@@ -1,4 +1,4 @@
-name: Todo App PR Closed
+name: PR closed
 
 concurrency:
   group: ${{ github.event.number }}

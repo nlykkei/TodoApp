@@ -1,4 +1,4 @@
-name: Todo App PR Validation
+name: PR validation
 
 concurrency: 
   group: ${{ github.event.number }}
@@ -50,8 +50,8 @@ jobs:
               --location ${{ env.resourceGroupLocation }}
     needs: [lint-infra, build-app]
 
-  deploy-infra:
-    name: Deploy infrastructure
+  deploy:
+    name: Deploy
     uses: ./.github/workflows/deploy.yml
     with:
       environment: test
