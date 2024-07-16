@@ -89,14 +89,24 @@ jobs:
 
   deploy-app:
     name: Deploy application
-    uses: ./.github/workflows/deploy-app.yml
-    with:
-      environment: ${{ inputs.environment }}
-      appServiceAppName: ${{ needs.deploy-infra.outputs.appServiceAppName }}
-    secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy application
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ needs.deploy-infra.outputs.appServiceAppName }}
+          package: publish.zip
     needs: [deploy-infra]
 
   # smoke-test:
@@ -113,4 +123,4 @@ jobs:
   #           -Container $container `
   #           -CI
   #       shell: pwsh
-  #   needs: [deploy-infra, deploy-app]
+  #   needs: [deploy-app]
