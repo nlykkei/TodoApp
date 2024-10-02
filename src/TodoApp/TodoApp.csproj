@@ -5,14 +5,22 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-TodoApp-cdfe22f0-0721-4347-b0c9-cdc17e08c8e0</UserSecretsId>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>TodoApp.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.6" NoWarn="NU1605" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="2.15.2"/>
-    <PackageReference Include="Microsoft.Identity.Web.GraphServiceClient" Version="2.15.2" />
-    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.15.2"/>
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.15.2" />
+    <PackageReference Include="Microsoft.Identity.Web.GraphServiceClient" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.15.2" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="serilog.sinks.applicationinsights" Version="4.0.0" />
+    <PackageReference Include="serilog.sinks.console" Version="6.0.0" />
+    <PackageReference Include="serilog.sinks.file" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 

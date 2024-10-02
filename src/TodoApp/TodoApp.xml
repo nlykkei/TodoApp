@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TodoApp</name>
+    </assembly>
+    <members>
+        <member name="M:TodoApp.Controllers.TodoController.GetTodos">
+            <summary>
+            Get todos
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TodoApp.Controllers.TodoController.GetTodo(System.Int32)">
+            <summary>
+            Get todo by id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TodoApp.Controllers.TodoController.CreateTodo(TodoApp.Models.CreateTodoDto)">
+            <summary>
+            Add todo
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TodoApp.Controllers.TodoController.UpdateTodo(System.Int32,TodoApp.Models.UpdateTodoDto)">
+            <summary>
+            Update todo by id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TodoApp.Controllers.TodoController.DeleteTodo(System.Int32)">
+            <summary>
+            Delete todo by id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:TodoApp.Models.CreateTodoDto">
+            <summary>
+            Data transfer object (DTO) for creating a todo item.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.CreateTodoDto.Title">
+            <summary>
+            Gets or sets the todo's title.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.CreateTodoDto.IsComplete">
+            <summary>
+            Gets or sets a value indicating whether the todo is complete.
+            </summary>
+        </member>
+        <member name="T:TodoApp.Models.Todo">
+            <summary>
+            A todo item.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.Todo.Id">
+            <summary>
+            Gets or sets the todo's identifier.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.Todo.Title">
+            <summary>
+            Gets or sets the todo's title.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.Todo.IsComplete">
+            <summary>
+            Gets or sets a value indicating whether the todo is complete.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.Todo.UserId">
+            <summary>
+            Gets or sets the user identifier associated with the todo.
+            </summary>
+        </member>
+        <member name="T:TodoApp.Models.TodoDto">
+            <summary>
+            Data transfer object (DTO) for a todo item.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.TodoDto.Id">
+            <summary>
+            Gets or sets the todo's identifier.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.TodoDto.Title">
+            <summary>
+            Gets or sets the todo's title.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.TodoDto.IsComplete">
+            <summary>
+            Gets or sets a value indicating whether the todo is complete.
+            </summary>
+        </member>
+        <member name="T:TodoApp.Models.UpdateTodoDto">
+            <summary>
+            Data transfer object for updating a todo item.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.UpdateTodoDto.Title">
+            <summary>
+            Gets or sets the todo's title.
+            </summary>
+        </member>
+        <member name="P:TodoApp.Models.UpdateTodoDto.IsComplete">
+            <summary>
+            Gets or sets a value indicating whether the todo is complete.
+            </summary>
+        </member>
+    </members>
+</doc>

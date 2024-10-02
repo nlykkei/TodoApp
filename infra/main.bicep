@@ -12,6 +12,8 @@ param environment string
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
+targetScope = 'resourceGroup'
+
 // @secure()
 // @description('The API key to use when accessing the product review API.')
 // param reviewApiKey string
